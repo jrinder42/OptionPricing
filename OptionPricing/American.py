@@ -27,9 +27,9 @@ class American:
 		self.T = float(self.T)
 		dt = round(self.T/steps, 5)
 		v = self.r - self.d
-		up = np.exp(v * np.sqrt(dt))
-		down = 1./up
-		p = (np.exp(self.r * dt) - down)/(up - down)
+		up = np.exp(self.sigma * np.sqrt(dt))
+		down = np.exp(-self.sigma * np.sqrt(dt))
+		p = (np.exp(v * dt) - down)/(up - down)
 
 		# Binomial Price Tree
 		val = np.zeros((steps + 1, steps + 1))

@@ -1,6 +1,7 @@
 import numpy as np
 from random import gauss
 from scipy.stats import norm
+import scipy.misc
 
 
 
@@ -60,9 +61,11 @@ class European:
 		self.T = float(self.T)
 		dt = round(self.T/steps, 5)
 		v = self.r - self.d
-		up = np.exp(v * np.sqrt(dt))
-		down = 1./up
-		p = (np.exp(self.r * dt) - down)/(up - down)
+		up = np.exp(self.sigma * np.sqrt(dt))
+		down = np.exp(-self.sigma * np.sqrt(dt))
+		p = (np.exp(v * dt) - down)/(up - down)
+		#q = 1 - p
+
 
 
 		# Binomial Price Tree

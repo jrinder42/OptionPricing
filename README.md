@@ -1,3 +1,5 @@
+* Please note that this is meant to be a test python package. 
+
 ## Option Pricing Python Library
 
 ### What is included?

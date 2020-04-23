@@ -1,11 +1,10 @@
 import numpy as np
 from random import gauss
 from scipy.stats import norm
-import scipy.misc
+#import math
 
 
-
-class European:
+class European():
 
 	'''
 	S: current stock price
@@ -25,9 +24,9 @@ class European:
 		self.d = d
 		self.b = self.r - self.d
 
-	def MonteCarlo(self, option):
+	def MonteCarlo(self, option, simulations=50000):
 		if option.lower() == "call":
-			simulations = 50000
+			#simulations = 50000
 			disc_factor = np.exp(-self.r * self.T)
 			payoffs = []
 			for i in xrange(simulations):
@@ -35,15 +34,14 @@ class European:
 				payoffs.append(max(0.0, S_t - self.X))
 			return disc_factor * (sum(payoffs) / float(simulations))
 		elif option.lower() == "put":
-			simulations = 50000
+			#simulations = 50000
 			disc_factor = np.exp(-self.r * self.T)
 			payoffs = []
 			for i in xrange(simulations):
 				S_t = self.S * np.exp((self.r - 0.5 * self.sigma**2) * self.T + self.sigma * np.sqrt(self.T) * gauss(0,1.0))
 				payoffs.append(max(0.0,self.X - S_t))
 			return disc_factor * (sum(payoffs) / float(simulations))
-		else:
-			return "Invalid data"
+		raise ValueError("Incorrect Parameters Entered")
 
 
 	def BlackScholes(self, option):
@@ -53,8 +51,7 @@ class European:
 			return self.S * np.exp(-self.d*self.T) * norm.cdf(d1) - self.X * np.exp(-self.r*self.T) * norm.cdf(d2)
 		elif option.lower() == "put":
 			return self.X * np.exp(-self.r*self.T) * norm.cdf(-d2) - self.S * np.exp(-self.d*self.T) * norm.cdf(-d1)
-		else:
-			return "Invalid data"
+		raise ValueError("Incorrect Parameters Entered")
 
 	# Cox-Ross-Rubenstein Binomial Pricing
 	def CRR(self, option, steps):
@@ -65,8 +62,6 @@ class European:
 		down = np.exp(-self.sigma * np.sqrt(dt))
 		p = (np.exp(v * dt) - down)/(up - down)
 		#q = 1 - p
-
-
 
 		# Binomial Price Tree
 		val = np.zeros((steps + 1, steps + 1))
@@ -82,7 +77,7 @@ class European:
 			if option.lower() == "call":
 				price[steps, i] = max(0, val[steps, i] - self.X)
 			elif option.lower() == "put":
-				price[steps, i] == max(0, self.X - val[steps, i])
+				price[steps, i] = max(0, self.X - val[steps, i])
 
 		# Backward recursion for option price
 		for i in xrange(steps - 1, -1, -1):
@@ -92,3 +87,25 @@ class European:
 		return price[0, 0]
 
 
+
+	def FiniteDifferenceImplicit(self):
+		pass
+
+	def FiniteDifferenceExplicit(self):
+		pass
+
+	def CrankNicolson(self):
+		# Special type of finite difference algorithm
+		pass
+
+if __name__ == "__main__":
+
+	EU = European(S=120, X=100, r=0.05, sigma=0.36, T=2)
+
+	print "Monte Carlo European:   " + str(EU.MonteCarlo("Call"))
+	print "Black Scholes European: " + str(EU.BlackScholes("Call"))
+	print "Binomial Tree European: " + str(EU.CRR("Call", 40))
+
+
+	E = European(S=100, X=90, r=0.05, sigma=0.36, T=2)
+	print "Black Scholes European: " + str(E.BlackScholes("Call"))
